@@ -86,145 +86,110 @@ public class Book {
         this.year = year;
     }
     //3.2. Phương thức nhập dữ liệu book
-    public void inputData(Scanner scanner, Book[] arrBook, int index) {
-        System.out.println("Nhập vào mã sách:");
+    public void inputData(Scanner scanner, Book[] arrBook, int numberBook) {
+        // 1. Mã sách duy nhất
         boolean checkBookId = true;
+        System.out.println("Nhập vào mã sách:");
         do {
             this.bookId = scanner.nextLine();
-            if (index!=0) {
-                boolean isExist = false;
-                for (int i = 0; i < index; i++) {
-                    if (arrBook[i].bookId.equals(this.bookId)) {
-                        isExist = true;
-                        break;
-                    }
-                }
-                if (!isExist){
+            //Kiểm tra mã sách là duy nhất,gồm 4 ký tự, bắt đầu là B
+            boolean isBookIdCheck = false;
+            for (int i = 0; i < numberBook; i++) {
+                if (arrBook[i].bookId.equals(this.bookId)) {
+                    isBookIdCheck = true;
                     break;
-                }else{
-                    System.err.println("Mã sinh viên đã tồn tại, vui lòng nhập lại");
                 }
-            }else{
-                break;
             }
-        }while(checkBookId);
+            if (isBookIdCheck) {
+                //Mã sách bị trùng lặp
+                System.err.println("Mã sách đã tồn tại, vui lòng nhập lại");
+            } else {
+                //Mã sách không bị trùng lặp
+                //Kiểm tra độ dài mã sách = 4
+                if (this.bookId.length() == 4) {
+                    //Kiểm tra mã sách bắt đầu là ký tự B
+                    if (this.bookId.charAt(0) == 'B') {
+                        break;
+                    } else {
+                        System.err.println("Mã sách bắt đầu là ký tự B, vui lòng nhập lại");
+                    }
+                } else {
+                    System.err.println("Mã sách phải gồm 4 ký tự, vui lòng nhập lại");
+                }
+            }
+        } while (checkBookId);
 
-        // Tên sách, không được trùng lặp, gồm 4
-        //ký tự, bắt đầu là ký tự B
+        // 2.Tên sách, không được trùng lặp.
+        boolean checkBookName = true;
         System.out.print("Nhập tên sách: ");
-        boolean checkBookName;
         do {
             this.bookName = scanner.nextLine();
-            checkBookName = validBookName(this.bookName) && uniqueBookName(arrBook, index, this.bookName);
-            if (!checkBookName) {
-                System.err.println("Vui lòng nhập đúng định dạng hoặc tên sách đã tồn tại");
+            boolean isCheckBookName = false;
+            //Kiểm tra tên sách là duy nhất
+            for (int i = 0; i < numberBook; i++) {
+                if (arrBook[i].bookName.equals(this.bookName)) {
+                    isCheckBookName = true;
+                    break;
+                }
             }
-        } while (!checkBookName);
-
-        System.out.print("Nhập giá nhập của sách: ");
-        boolean checkImportPrice;
+            if (!isCheckBookName) {
+                //Tên sách không bị trùng lặp
+                break;
+            } else {
+                //Tên sách bị trùng lặp
+                System.err.println("Tên sách đã tồn tại, vui lòng nhập lại");
+            }
+        } while (checkBookName);
+        //3. Giá nhập của sách có giá trị lớn hơn 0
+        boolean checkImportPrice = true;
+        System.out.println(" Giá nhập của sách : ");
         do {
             this.importPrice = Float.parseFloat(scanner.nextLine());
-            checkImportPrice = validateImportPrice(this.importPrice);
-            if (!checkImportPrice) {
-                System.err.println("Vui lòng nhập giá sách lớn hơn 0");
+            if (this.importPrice > 0) {
+                break;
+            } else {
+                System.err.println("Giá sách phải lớn hơn 0, vui lòng nhập lại");
             }
-        } while (!checkImportPrice);
-
-        System.out.print("Nhập giá xuất của sách: ");
-        boolean checkExportPrice;
+        } while (checkImportPrice);
+        //4. Giá xuất của sách, có giá trị lớn hơn ít
+        //nhất 30% so với giá nhập
+        boolean checkExportPrice = true;
+        System.out.println("Giá xuất của sách :");
         do {
             this.exportPrice = Float.parseFloat(scanner.nextLine());
-            checkExportPrice = validateExportPrice(this.exportPrice, this.importPrice);
-            if (!checkExportPrice) {
-                System.err.println("Giá xuất phải lớn hơn ít nhất 30% so với giá nhập");
+            if (this.exportPrice >= this.importPrice * 1.3) {
+                break;
+            } else {
+                System.err.println("Giá xuất phải có giá trị lớn hơn 30% so với giá nhập, vui lòng nhập lại");
             }
-        } while (!checkExportPrice);
-
-        System.out.print("Nhập tên tác giả: ");
-        boolean checkAuthor;
+        } while (checkExportPrice);
+        //5.Tác giả, có từ 6-50 ký tự
+        boolean checkAuthor = true;
+        System.out.println("Nhập vào tên tác  giả của sách :");
         do {
             this.author = scanner.nextLine();
-            checkAuthor = validateAuthor(this.author);
-            if (!checkAuthor) {
-                System.err.println("Vui lòng nhập tên tác giả chứa 6 - 50 ký tự");
+            if (this.author.length() >= 6 && this.author.length() <= 50) {
+                break;
+            } else {
+                System.err.println("Tên tác giả từ 6-50 ký tự, vui lòng nhập lại");
             }
-        } while (!checkAuthor);
-
-        System.out.print("Nhập năm xuất bản: ");
-        boolean checkYear;
+        } while (checkAuthor);
+        //6. Năm xuất bản, ít nhất xuất bản sau năm 2000
+        boolean checkYear = true;
+        System.out.println("Nhập năm xuất bản : ");
         do {
             this.year = Integer.parseInt(scanner.nextLine());
-            checkYear = validateYear(this.year);
-            if (!checkYear) {
-                System.err.println("Vui lòng nhập năm xuất bản sau năm 2000");
+            if (this.year >= 2000) {
+                break;
+            } else {
+                System.err.println("Năm xuất bản phải sau năm 2000, vui lòng nhập lại");
             }
-        } while (!checkYear);
+        } while (checkYear);
     }
-
-    public void displayData(Scanner scanner, Book[] arrBook, int index) {
-        System.out.printf("%-15s%-15s%-25.1f%-25.1f%-20.1f%-15s%-20d\n", this.bookId, this.bookName, this.importPrice, this.exportPrice, this.interest, this.author, this.year);
+        public void displayData(){
+            System.out.printf("Mã sách:%-15sTên sách:%-15sGiá nhập:%-25.1fGiá xuất:%-25.1fLợi nhuận:%-20.1fTên tác giả:%-15sNăm xuất bản:%-20d\n", this.bookId, this.bookName, this.importPrice, this.exportPrice, this.interest, this.author, this.year);
     }
-    public void calinterest(){
-        this.interest = (this.exportPrice-this.importPrice);
-    }
-
-    // check uniqueBookId
-    public boolean uniqueBookId(Book[] arrBook, int index, String bookId) {
-        for (int i = 0; i < index; i++) {
-            if (arrBook[i].bookId.equals(this.bookId)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // check bookNameRegex and uniqueBookName
-    public boolean validBookName(String bookName) {
-        String bookNameRegex = "^[B][a-z0-9_-]{3}$";
-        return Pattern.matches(bookNameRegex, bookName);
-    }
-
-    public boolean uniqueBookName(Book[] arrBook, int index, String bookName) {
-        for (int i = 0; i < index; i++) {
-            if (arrBook[i].bookName.equals(this.bookName)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean validateImportPrice(Float importPrice) {
-        if (this.importPrice > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean validateExportPrice(Float exportPrice, Float importPrice) {
-        //: Giá xuất của sách, có giá trị lớn hơn ít
-        //nhất 30% so với giá nhập
-        //        Float isCheck = (this.importPrice * 1.3F);
-        if (this.exportPrice >= (this.importPrice * 1.3)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean validateAuthor(String author) {
-        // Tác giả, có từ 6-50 ký tự
-        String authorRegex = "^(?=.{6,50}$)[A-Za-zÀ-ỹ][A-Za-zÀ-ỹ ]*$";
-        return Pattern.matches(authorRegex, author);
-    }
-
-    public boolean validateYear(int year) {
-        // Năm xuất bản, ít nhất xuất bản sau năm 2000
-        if (this.year >= 2000) {
-            return true;
-        } else {
-            return false;
-        }
+    public void calInterrest(){
+        this.interest=this.exportPrice-this.importPrice;
     }
 }
